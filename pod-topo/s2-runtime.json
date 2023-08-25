@@ -1,0 +1,147 @@
+{
+  "target": "bmv2",
+  "p4info": "build/modbus.p4.p4info.txt",
+  "bmv2_json": "build/modbus.json",
+  "table_entries": [
+
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "default_action": true,
+      "action_name": "MyIngress.drop",
+      "action_params": { }
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.2.1", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "port": 1
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.2.2", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "port": 2
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.1", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "port": 3
+      }
+    },
+    {
+      "table": "MyIngress.check_ports",
+      "match": {
+        "standard_metadata.ingress_port": 1,
+        "standard_metadata.egress_spec": 3
+      },
+      "action_name": "MyIngress.set_direction",
+      "action_params": {
+        "dir": 1
+      }
+    },
+    {
+      "table": "MyIngress.check_ports",
+      "match": {
+        "standard_metadata.ingress_port": 2,
+        "standard_metadata.egress_spec": 3
+      },
+      "action_name": "MyIngress.set_direction",
+      "action_params": {
+        "dir": 1
+      }
+    },
+   {
+      "table": "MyIngress.check_ports",
+      "match": {
+        "standard_metadata.ingress_port": 3,
+        "standard_metadata.egress_spec": 1
+      },
+      "action_name": "MyIngress.set_direction",
+      "action_params": {
+        "dir": 0
+      }
+    },
+    {
+      "table": "MyIngress.check_ports",
+      "match": {
+        "standard_metadata.ingress_port": 3,
+        "standard_metadata.egress_spec": 2
+      },
+      "action_name": "MyIngress.set_direction",
+      "action_params": {
+        "dir": 0
+      }
+    },
+   {
+      "table": "MyIngress.flowOut",
+      "default_action": true,
+      "action_name": "NoAction",
+      "action_params": { }
+    },
+    {
+      "table": "MyIngress.flowOut",
+      "match": {
+        "hdr.ipv4.dstAddr":  ["10.0.2.1"],
+        "hdr.ipv4.srcAddr":  ["10.0.1.1"],
+        "hdr.tcp.dstPort":   502,
+        "hdr.ipv4.protocol": 6,
+        "direction":         0
+      },
+      "action_name": "MyIngress.setPort",
+      "action_params": {
+       }
+    },
+   {
+      "table": "MyIngress.flowIn",
+      "default_action": true,
+      "action_name": "MyIngress.drop",
+      "action_params": { }
+    },
+   {
+      "table": "MyIngress.flowIn",
+      "match": {
+        "hdr.ipv4.dstAddr":  ["10.0.1.1"],
+        "hdr.ipv4.srcAddr":  ["10.0.2.1"],
+        "hdr.tcp.srcPort":   502,
+        "hdr.ipv4.protocol": 6,
+        "direction":         1
+      },
+      "action_name": "MyIngress.setPort",
+      "action_params": { }
+    },
+    {
+      "table": "MyIngress.modbusCheck",
+      "default_action": true,
+      "action_name": "MyIngress.drop",
+      "action_params": { }
+    },
+   {
+      "table": "MyIngress.modbusCheck",
+      "match": {
+        "hdr.modbus.functionCode":  1
+      },
+      "action_name": "MyIngress.setPort",
+      "action_params": { }
+    },
+    {
+       "table": "MyIngress.modbusCheck",
+       "match": {
+         "hdr.modbus.functionCode":  8
+       },
+       "action_name": "MyIngress.setPort",
+       "action_params": { }
+     }
+  ]
+}

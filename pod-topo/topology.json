@@ -1,0 +1,47 @@
+{
+    "hosts": {
+        "hmaster": {"ip": "10.0.1.1/24", "mac": "08:00:00:00:01:11",
+               "commands":["route add default gw 10.0.1.10 dev eth0",
+                           "export 'PATH=/home/p4/Modbus-Sim/modpoll/x86_64-linux-gnu:$PATH'",
+                           "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00"]},
+
+        "hrtu1": {"ip": "10.0.2.1/24", "mac": "08:00:00:00:02:21",
+               "commands":["route add default gw 10.0.2.10 dev eth0",
+                           "export 'PATH=/home/p4/Modbus-Sim/diagslave/x86_64-linux-gnu:$PATH'",
+                           "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00"]},
+
+        "hrtu2": {"ip": "10.0.2.2/24", "mac": "08:00:00:00:02:22",
+               "commands":["route add default gw 10.0.2.10 dev eth0",
+                           "export 'PATH=/home/p4/Modbus-Sim/diagslave/x86_64-linux-gnu:$PATH'",
+                           "arp -i eth0 -s 10.0.2.10 08:00:00:00:02:00"]},
+
+        "hrtu3": {"ip": "10.0.3.1/24", "mac": "08:00:00:00:03:31",
+               "commands":["route add default gw 10.0.3.10 dev eth0",
+                           "export 'PATH=/home/p4/Modbus-Sim/diagslave/x86_64-linux-gnu:$PATH'",
+                           "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00"]},
+
+        "hrtu4": {"ip": "10.0.3.2/24", "mac": "08:00:00:00:03:32",
+               "commands":["route add default gw 10.0.3.10 dev eth0",
+                           "export 'PATH=/home/p4/Modbus-Sim/diagslave/x86_64-linux-gnu:$PATH'",
+                           "arp -i eth0 -s 10.0.3.10 08:00:00:00:03:00"]}
+    },
+    "switches": {
+        "s1":  { "runtime_json" : "pod-topo/s1-master.json" ,
+		 "program" : "build/modbus.json" },
+        "s2":  { "runtime_json" : "pod-topo/s2-runtime.json" ,
+		 "program" : "build/modbus.json" },
+        "s3":  { "runtime_json" : "pod-topo/s3-runtime.json" ,
+		 "program" : "build/modbus.json" },
+        "r1": { "runtime_json" : "pod-topo/r1-runtime.json" ,
+		 "program" : "build/router.json" },
+        "r2": { "runtime_json" : "pod-topo/r2-runtime.json" ,
+		 "program" : "build/router.json" },
+        "r3": { "runtime_json" : "pod-topo/r3-runtime.json" ,
+		 "program" : "build/router.json" }
+    },
+    "links": [
+	["hmaster", "s1-p1"], ["hrtu1", "s2-p1"], ["hrtu2", "s2-p2"], ["hrtu3", "s3-p1"], ["hrtu4", "s3-p2"],
+	["s1-p2", "r1-p1"], ["s2-p3", "r2-p1"], ["s3-p3", "r3-p1"],
+	["r1-p2", "r2-p3"], ["r2-p2", "r3-p3"], ["r3-p2", "r1-p3"]
+    ]
+}
