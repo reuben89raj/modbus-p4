@@ -351,7 +351,7 @@ control MyIngress(inout headers hdr,
             {
                 hdr.ipv4.srcAddr,
                 hdr.ipv4.dstAddr,
-                hdr.tcp.srcPort,
+                hdr.tcp.srcPort, // srcPort can be removed if Modbus Master changes the src port for each request
                 hdr.tcp.dstPort,
                 hdr.modbus.functionCode
             },
