@@ -19,7 +19,7 @@ SWITCH_TO_HOST_PORT = 1
 SWITCH_TO_SWITCH_PORT = 2
 
 
-def writeTunnelRules(p4info_helper, ingress_sw, egress_sw, tunnel_id,
+def writeInitSwRules(p4info_helper, ingress_sw, egress_sw, tunnel_id,
                      dst_eth_addr, dst_ip_addr):
     """
     Installs three rules:
@@ -170,11 +170,17 @@ def main(p4info_file_path, bmv2_file_path):
             address='127.0.0.1:50052',
             device_id=1,
             proto_dump_file='logs/s2-p4runtime-requests.txt')
+        s3 = p4runtime_lib.bmv2.Bmv2SwitchConnection(
+            name='s3',
+            address='127.0.0.1:50053',
+            device_id=2,
+            proto_dump_file='logs/s3-p4runtime-requests.txt')
 
         # Send master arbitration update message to establish this controller as
         # master (required by P4Runtime before performing any other write operation)
         s1.MasterArbitrationUpdate()
         s2.MasterArbitrationUpdate()
+        s3.MasterArbitrationUpdate()
 
         # Install the P4 program on the switches
         s1.SetForwardingPipelineConfig(p4info=p4info_helper.p4info,
@@ -184,12 +190,16 @@ def main(p4info_file_path, bmv2_file_path):
                                        bmv2_json_file_path=bmv2_file_path)
         print("Installed P4 Program using SetForwardingPipelineConfig on s2")
 
+        s3.SetForwardingPipelineConfig(p4info=p4info_helper.p4info,
+                                       bmv2_json_file_path=bmv2_file_path)
+        print("Installed P4 Program using SetForwardingPipelineConfig on s3")
+
         # Write the rules that tunnel traffic from h1 to h2
-        writeTunnelRules(p4info_helper, ingress_sw=s1, egress_sw=s2, tunnel_id=100,
+        writeInitSwRules(p4info_helper, ingress_sw=s1, egress_sw=s2, tunnel_id=100,
                          dst_eth_addr="08:00:00:00:02:22", dst_ip_addr="10.0.2.2")
 
         # Write the rules that tunnel traffic from h2 to h1
-        writeTunnelRules(p4info_helper, ingress_sw=s2, egress_sw=s1, tunnel_id=200,
+        writeInitSwRules(p4info_helper, ingress_sw=s2, egress_sw=s1, tunnel_id=200,
                          dst_eth_addr="08:00:00:00:01:11", dst_ip_addr="10.0.1.1")
 
         # TODO Uncomment the following two lines to read table entries from s1 and s2
